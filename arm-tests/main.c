@@ -4,7 +4,7 @@
 extern int run_data_processing_tests();
 
 int main(void) {
-	consoleDemoInit();
+    consoleDemoInit();
 
     int test_failed = run_data_processing_tests();
 
@@ -14,5 +14,5 @@ int main(void) {
         printf("data processing\nall tests passed!\n");
     }
 
-	while(1) {}
+    while(1) {}
 }
