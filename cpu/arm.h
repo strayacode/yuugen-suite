@@ -1,3 +1,6 @@
 #pragma once
 
-void test_arm_data_processing();
+#include "../common/testing.h"
+
+define_test(test_arm_mov);
+define_test(test_arm_add);
