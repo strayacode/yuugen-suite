@@ -255,3 +255,17 @@ define_test(test_arm_bic) {
 
     expect_eq(output, 0x1);
 }
+
+define_test(test_arm_data_processing_r15) {
+    // r15 as operand
+    u32 output = 0;
+
+    asm(
+        "add r1, r15, #4\n"
+        "mov r2, r15\n"
+        "sub %r0, r1, r2"
+        : "=r" (output)
+    );
+
+    expect_eq(output, 0x0);
+}

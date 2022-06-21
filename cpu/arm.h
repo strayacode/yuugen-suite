@@ -18,3 +18,4 @@ define_test(test_arm_tst);
 define_test(test_arm_teq);
 define_test(test_arm_cmn);
 define_test(test_arm_bic);
+define_test(test_arm_data_processing_r15);

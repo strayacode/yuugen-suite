@@ -1,13 +1,16 @@
 #include <nds.h>
 #include <stdio.h>
 #include "cpu/arm.h"
+#include "memory/vram_banking.h"
 
 int main(void) {
     PrintConsole* console = consoleDemoInit();
     consoleSetWindow(console, 2, 2, 256, 192);
+    save_vramcnt();
 
     printf("yuugen-suite\n");
 
+    // cpu tests
     run_test(test_arm_mov);
     run_test(test_arm_mvn);
     run_test(test_arm_and);
@@ -24,6 +27,10 @@ int main(void) {
     run_test(test_arm_teq);
     run_test(test_arm_cmn);
     run_test(test_arm_bic);
+    run_test(test_arm_data_processing_r15);
+
+    // vram mapping tests
+    run_test(test_vram_lcdc);
 
     int ran = get_tests_ran();
     int failed = get_tests_failed();
