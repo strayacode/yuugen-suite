@@ -3,9 +3,15 @@
 #include "../common/defines.h"
 #include "vram_banking.h"
 
-// TODO: test unaligned vram writes
-// TODO: test overlapping banks
+static int mst(int val) {
+    return val & 0x7;
+}
 
+static int ofs(int val) {
+    return (val & 0x3) << 3;
+}
+
+// TODO: test unaligned vram writes
 define_test(test_vram_lcdc) {
     write_vramcnt_a(0x80);
     write_vramcnt_b(0x80);
@@ -73,4 +79,39 @@ define_test(test_vram_lcdc) {
     expect_eq(bank_h_end, 0x10);
     expect_eq(bank_i_start, 0x11);
     expect_eq(bank_i_end, 0x12);
+}
+
+define_test(test_vram_overlapping) {
+    // configure bank a and b to use lcdc so we can write to them separately
+    write_vramcnt_a(0x80);
+    write_vramcnt_b(0x80);
+
+    *(vu32*)0x06800000 = 0x11;
+    *(vu32*)0x06820000 = 0x22;
+
+    // make bank a and b overlapping now
+    write_vramcnt_a(0x80 | mst(1) | ofs(0));
+    write_vramcnt_b(0x80 | mst(1) | ofs(0));
+
+    u32 vram_start = *(vu32*)0x06000000;
+
+    // reads from overlapping banks should bitwise OR the values together
+    expect_eq(vram_start, 0x33);
+
+    // reconfigure again since printing restores vramcnt state used to print
+    write_vramcnt_a(0x80 | mst(1) | ofs(0));
+    write_vramcnt_b(0x80 | mst(1) | ofs(0));
+
+    *(vu32*)0x06000000 = 0x11;
+    
+    // reconfigure them to use lcdc so we can read them separately
+    write_vramcnt_a(0x80);
+    write_vramcnt_b(0x80);
+
+    u32 bank_a_start = *(vu32*)0x06800000;
+    u32 bank_b_start = *(vu32*)0x06820000;
+
+    // writes to an address that is used by multiple banks causes the write to go to all the overlapping banks
+    expect_eq(bank_a_start, 0x11);
+    expect_eq(bank_b_start, 0x11);
 }

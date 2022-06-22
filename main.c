@@ -31,6 +31,7 @@ int main(void) {
 
     // vram mapping tests
     run_test(test_vram_lcdc);
+    run_test(test_vram_overlapping);
 
     int ran = get_tests_ran();
     int failed = get_tests_failed();
